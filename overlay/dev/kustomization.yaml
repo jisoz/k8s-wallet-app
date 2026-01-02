@@ -12,4 +12,5 @@ patches:
   - path: patches/postgres-storage.yaml
   - path: patches/redis-storage.yaml
   - path: patches/wallet-replicas.yaml
+  - path: patches/deploy-front.yaml
 

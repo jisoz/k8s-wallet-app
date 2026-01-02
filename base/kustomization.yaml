@@ -6,4 +6,4 @@ resources:
   - postgres
   - redis
   - apps/wallet
-  - registry
+  - apps/frontend
