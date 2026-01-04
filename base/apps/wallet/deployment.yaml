@@ -1,67 +1,67 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: wallet
-spec:
-  replicas: 1
-  revisionHistoryLimit: 5
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: wallet
+# spec:
+#   replicas: 1
+#   revisionHistoryLimit: 5
 
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 25%
+#   strategy:
+#     type: RollingUpdate
+#     rollingUpdate:
+#       maxUnavailable: 0
+#       maxSurge: 25%
 
-  selector:
-    matchLabels:
-      app: wallet
+#   selector:
+#     matchLabels:
+#       app: wallet
 
-  template:
-    metadata:
-      labels:
-        app: wallet
-    spec:
-      containers:
-        - name: wallet
-          image: YOUR_REGISTRY/wallet:dev
-          imagePullPolicy: IfNotPresent
+#   template:
+#     metadata:
+#       labels:
+#         app: wallet
+#     spec:
+#       containers:
+#         - name: wallet
+#           image: YOUR_REGISTRY/wallet:dev
+#           imagePullPolicy: IfNotPresent
 
-          ports:
-            - containerPort: 1314
-              name: http
+#           ports:
+#             - containerPort: 1314
+#               name: http
 
-          env:
-            - name: DATABASE_HOST
-              value: postgres
-            - name: REDIS_HOST
-              value: redis
+#           env:
+#             - name: DATABASE_HOST
+#               value: postgres
+#             - name: REDIS_HOST
+#               value: redis
 
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 1314
-            initialDelaySeconds: 5
-            periodSeconds: 5
+#           readinessProbe:
+#             httpGet:
+#               path: /health
+#               port: 1314
+#             initialDelaySeconds: 5
+#             periodSeconds: 5
 
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 1314
-            initialDelaySeconds: 15
-            periodSeconds: 10
+#           livenessProbe:
+#             httpGet:
+#               path: /health
+#               port: 1314
+#             initialDelaySeconds: 15
+#             periodSeconds: 10
 
-          startupProbe:
-            httpGet:
-              path: /health
-              port: 1314
-            failureThreshold: 30
-            periodSeconds: 2
+#           startupProbe:
+#             httpGet:
+#               path: /health
+#               port: 1314
+#             failureThreshold: 30
+#             periodSeconds: 2
 
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "256Mi"
+#           resources:
+#             requests:
+#               cpu: "100m"
+#               memory: "128Mi"
+#             limits:
+#               cpu: "500m"
+#               memory: "256Mi"
 
