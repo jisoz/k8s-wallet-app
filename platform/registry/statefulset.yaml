@@ -35,7 +35,7 @@ spec:
             - name: REGISTRY_AUTH_HTPASSWD_PATH
               value: /auth/htpasswd
             - name: REGISTRY_HTTP_HOST
-              value: https://dependence-ship-icq-secretariat.trycloudflare.com
+              value: https://facial-berkeley-insured-topic.trycloudflare.com
 
           volumeMounts:
             - name: auth

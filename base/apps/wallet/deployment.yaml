@@ -1,67 +1,74 @@
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: wallet
-# spec:
-#   replicas: 1
-#   revisionHistoryLimit: 5
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallet
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: wallet
+  template:
+    metadata:
+      labels:
+        app: wallet
+    spec:
+      serviceAccountName: wallet-sa
 
-#   strategy:
-#     type: RollingUpdate
-#     rollingUpdate:
-#       maxUnavailable: 0
-#       maxSurge: 25%
+      initContainers:
+        - name: migrate
+          image: your-registry/wallet:prod
+          command:
+            - /bin/sh
+            - -c
+            - ./main migrate --config /config/config.yaml
+          volumeMounts:
+            - name: config
+              mountPath: /config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wallet-secrets
+                  key: DB_PASSWORD
 
-#   selector:
-#     matchLabels:
-#       app: wallet
+      containers:
+        - name: wallet
+          image: your-registry/wallet:prod
+          command:
+            - ./main
+            - server
+            - --config
+            - /config/config.yaml
+          ports:
+            - containerPort: 1314
 
-#   template:
-#     metadata:
-#       labels:
-#         app: wallet
-#     spec:
-#       containers:
-#         - name: wallet
-#           image: YOUR_REGISTRY/wallet:dev
-#           imagePullPolicy: IfNotPresent
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 1314
+            initialDelaySeconds: 5
+            periodSeconds: 5
 
-#           ports:
-#             - containerPort: 1314
-#               name: http
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 1314
+            initialDelaySeconds: 20
+            periodSeconds: 10
 
-#           env:
-#             - name: DATABASE_HOST
-#               value: postgres
-#             - name: REDIS_HOST
-#               value: redis
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
 
-#           readinessProbe:
-#             httpGet:
-#               path: /health
-#               port: 1314
-#             initialDelaySeconds: 5
-#             periodSeconds: 5
+          volumeMounts:
+            - name: config
+              mountPath: /config
 
-#           livenessProbe:
-#             httpGet:
-#               path: /health
-#               port: 1314
-#             initialDelaySeconds: 15
-#             periodSeconds: 10
-
-#           startupProbe:
-#             httpGet:
-#               path: /health
-#               port: 1314
-#             failureThreshold: 30
-#             periodSeconds: 2
-
-#           resources:
-#             requests:
-#               cpu: "100m"
-#               memory: "128Mi"
-#             limits:
-#               cpu: "500m"
-#               memory: "256Mi"
+      volumes:
+        - name: config
+          configMap:
+            name: wallet-config
 

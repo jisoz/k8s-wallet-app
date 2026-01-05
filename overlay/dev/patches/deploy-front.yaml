@@ -7,5 +7,5 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: dependence-ship-icq-secretariat.trycloudflare.com/frontend:prod-c919777
+          image: facial-berkeley-insured-topic.trycloudflare.com/frontend:dev-b132d4d
 
