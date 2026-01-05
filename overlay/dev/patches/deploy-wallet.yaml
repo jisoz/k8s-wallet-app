@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wallet
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: wallet
+          image: facial-berkeley-insured-topic.trycloudflare.com/wallet:dev-bc388e4
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+
+      initContainers:
+        - name: migrate
+          image: facial-berkeley-insured-topic.trycloudflare.com/wallet:dev-bc388e4

@@ -5,5 +5,5 @@ resources:
 
   - postgres
   - redis
- # - apps/wallet
+  - apps/wallet
   - apps/frontend

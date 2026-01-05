@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: wallet
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: wallet
@@ -16,7 +16,7 @@ spec:
 
       initContainers:
         - name: migrate
-          image: your-registry/wallet:prod
+          image: registry/wallet:main
           command:
             - /bin/sh
             - -c
@@ -33,7 +33,7 @@ spec:
 
       containers:
         - name: wallet
-          image: your-registry/wallet:prod
+          image: registry/wallet:main
           command:
             - ./main
             - server
