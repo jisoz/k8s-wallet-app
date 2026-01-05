@@ -42,6 +42,14 @@ spec:
           ports:
             - containerPort: 1314
 
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: wallet-secrets
+                  key: DB_PASSWORD
+          
+
           readinessProbe:
             httpGet:
               path: /health

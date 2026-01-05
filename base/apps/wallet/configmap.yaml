@@ -4,12 +4,26 @@ metadata:
   name: wallet-config
 data:
   config.yaml: |
-    database:
+    swaggerServer:
+      enable: true
+      port: 1314
+
+    apiServer:
+      enable: true
+      port: 8081
+
+    postgreSQL:
       host: postgres
       port: 5432
       user: postgres
-      name: wallet
+      password: postgres
+      dbname: wallet
+      sslmode: disable
+
     redis:
       host: redis
       port: 6379
-
+      password: ""
+      db: 0
+      maxRetries: 3
+      poolSize: 10
