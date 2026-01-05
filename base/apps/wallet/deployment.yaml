@@ -2,81 +2,192 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: wallet
+  labels:
+    app: wallet
+  annotations:
+    # Useful for rollback tracking
+    deployment.kubernetes.io/revision: "1"
 spec:
-  replicas: 1
+  # Deployment strategy for safe rollouts
+  replicas: 3  # Minimum 3 for high availability
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  # Only 1 pod down at a time
+      maxSurge: 1        # Only 1 extra pod during update
+  
   selector:
     matchLabels:
       app: wallet
+      
+  
   template:
     metadata:
       labels:
         app: wallet
+        version: "1.0.0"  # Version label for tracking
+      annotations:
+        # Checksum for config changes (auto-update pods when config changes)
+        checksum/config: "{{ include (print $.Template.BasePath \"/configmap.yaml\") . | sha256sum }}"
+    
     spec:
       serviceAccountName: wallet-sa
-
+      
+      # 🔴 NO initContainers here - migrations run separately
+      
+      # Pod readiness for dependencies
       initContainers:
-        - name: migrate
-          image: registry/wallet:main
+        - name: wait-for-dependencies
+          image: busybox:1.36
           command:
             - /bin/sh
             - -c
-            - ./main migrate --config /config/config.yaml
-          volumeMounts:
-            - name: config
-              mountPath: /config
-          env:
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: wallet-secrets
-                  key: DB_PASSWORD
-
+            - |
+              # Wait for PostgreSQL
+              echo "Waiting for PostgreSQL..."
+              until nc -z postgres 5432; do
+                sleep 2
+              done
+              echo "PostgreSQL is ready!"
+              
+              # Wait for Redis
+              echo "Waiting for Redis..."
+              until nc -z redis 6379; do
+                sleep 2
+              done
+              echo "Redis is ready!"
+          
+          # Minimal resources for wait container
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
+      
       containers:
         - name: wallet
           image: registry/wallet:main
-          command:
-            - ./main
-            - server
-            - --config
-            - /config/config.yaml
+          imagePullPolicy: IfNotPresent  # Safer for production
+          
+          # Security context
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          
+          # Use args instead of command for cleaner override
+          args:
+            - "server"
+            - "--config"
+            - "/config/config.yaml"
+          
           ports:
-            - containerPort: 1314
-
+            - name: http
+              containerPort: 1314
+              protocol: TCP
+          
           env:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: wallet-secrets
                   key: DB_PASSWORD
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           
-
+          # Health checks - Updated with correct path
+          startupProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 1314
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30  # 150 seconds max startup time
+          
           readinessProbe:
             httpGet:
-              path: /health
+              path: /api/v1/health
               port: 1314
             initialDelaySeconds: 5
-            periodSeconds: 5
-
+            periodSeconds: 10
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          
           livenessProbe:
             httpGet:
-              path: /health
+              path: /api/v1/health
               port: 1314
-            initialDelaySeconds: 20
-            periodSeconds: 10
-
+            initialDelaySeconds: 60  # Wait for app to stabilize
+            periodSeconds: 30
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          
+          # Resource management
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
-            limits:
+              cpu: 200m
               memory: 256Mi
-
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          
+          # Lifecycle hooks
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    # Graceful shutdown
+                    echo "Received termination signal, waiting 30s for connections to drain..."
+                    sleep 30
+          
+          # Volume mounts
           volumeMounts:
             - name: config
               mountPath: /config
-
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+          
+          # Logging configuration
+          env:
+            - name: LOG_LEVEL
+              value: "info"
+      
       volumes:
         - name: config
           configMap:
             name: wallet-config
-
+        - name: tmp
+          emptyDir: {}
+      
+      # Node selector/affinity for better scheduling
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - wallet
+                topologyKey: kubernetes.io/hostname
