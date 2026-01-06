@@ -8,9 +8,9 @@ resources:
   - ../../base
 
 patches:
-  - path: patches/postgres-resources.yaml
-  - path: patches/postgres-storage.yaml
-  - path: patches/postgres-secret.yaml
+  - path: patches/postgres/postgres-resources.yaml
+  - path: patches/postgres/postgres-storage.yaml
+  - path: patches/postgres/postgres-secret.yaml
 
 
   - path: patches/redis-storage.yaml
