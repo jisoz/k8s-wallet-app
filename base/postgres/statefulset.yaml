@@ -18,10 +18,7 @@ spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         fsGroup: 999
-        runAsNonRoot: true
-
-        
-        
+                
       containers:
         - name: postgres
           image: postgres:15
@@ -30,8 +27,11 @@ spec:
           securityContext:
             runAsUser: 999
             runAsGroup: 999
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false  # Allow writes for development
+            privileged: false
+            readOnlyRootFilesystem: false  # Allow writes
+            capabilities:
+              drop:
+                - ALL 
 
           ports:
             - containerPort: 5432
@@ -41,7 +41,9 @@ spec:
           envFrom:
             - secretRef:
                 name: postgres-secret
-
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           args:
             - "-c"
             - "max_connections=200"
