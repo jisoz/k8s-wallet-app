@@ -3,6 +3,7 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: postgres-init-databases
+  namespace: wallet-dev
 spec:
   backoffLimit: 3  # Retry 3 times
   template:
