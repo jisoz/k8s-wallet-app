@@ -8,8 +8,15 @@ resources:
   - ../../base
 
 patches:
-  - path: patches/postgres/*
-  - path: patches/frontend/*
-  - path: patches/wallet/*
-  - path: patches/redis-storage.yaml 
+  - path: patches/postgres-resources.yaml
+  - path: patches/postgres-storage.yaml
+  - path: patches/postgres-secret.yaml
+
+
+  - path: patches/redis-storage.yaml
+
+  - path: patches/frontend/deploy-front.yaml
+  
+  - path: patches/wallet/wallet-secret.yaml
+  - path: patches/wallet/deploy-wallet.yaml
 
