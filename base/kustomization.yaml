@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
 
   - postgres
-  # - redis
+  - redis
   # - apps/wallet
   # - apps/frontend

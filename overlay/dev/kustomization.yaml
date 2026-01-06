@@ -10,7 +10,7 @@ resources:
 patches:
   - path: patches/postgres-resources.yaml
   - path: patches/postgres-storage.yaml
-  # - path: patches/redis-storage.yaml
+  - path: patches/redis-storage.yaml
   # - path: patches/deploy-wallet.yaml
   # - path: patches/deploy-front.yaml
 
