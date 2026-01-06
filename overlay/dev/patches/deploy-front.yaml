@@ -3,9 +3,10 @@ kind: Deployment
 metadata:
   name: frontend
 spec:
+  replicas: 2 
   template:
     spec:
       containers:
         - name: frontend
-          image: facial-berkeley-insured-topic.trycloudflare.com/frontend:dev-b132d4d
+          image:  tom-surprised-traveler-crossing.trycloudflare.com/frontend:dev-b132d4d
 

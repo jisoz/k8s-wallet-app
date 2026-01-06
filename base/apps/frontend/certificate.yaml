@@ -1,12 +1,12 @@
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: app-local-cert
-spec:
-  secretName: app-local-tls
-  issuerRef:
-    name: onprem-ca
-    kind: ClusterIssuer
-  commonName: app.local
-  dnsNames:
-  - app.local
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: app-local-cert
+# spec:
+#   secretName: app-local-tls
+#   issuerRef:
+#     name: onprem-ca
+#     kind: ClusterIssuer
+#   commonName: app.local
+#   dnsNames:
+#   - app.local
