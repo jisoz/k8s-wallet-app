@@ -73,14 +73,11 @@ spec:
           
           # Command/args
           command:
-            - /bin/sh
-            - -c
-            - |
-              # Replace ${DB_PASSWORD} with actual value from env var
-              sed -i "s/\${DB_PASSWORD}/$DB_PASSWORD/g" /config/config.yaml
-              
-              # Run the app
-              ./main server --config /config/config.yaml
+            - "./main"
+          args:
+            - "server"
+            - "--config"
+            - "/config/config.yaml"
           
           ports:
             - name: http
