@@ -9,8 +9,8 @@ spec:
         - name: postgres
           resources:
             requests:
-              cpu: "150m"
-              memory: "384Mi"
+              cpu: "100m"
+              memory: "256Mi"
             limits:
-              memory: "768Mi"
+              memory: "512Mi"
 

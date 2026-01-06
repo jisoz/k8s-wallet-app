@@ -8,22 +8,35 @@ spec:
   selector:
     matchLabels:
       app: postgres
-
+      label: dev
   template:
     metadata:
       labels:
         app: postgres
+        label: dev
     spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         fsGroup: 999
+        runAsNonRoot: true
 
+        
+        
       containers:
         - name: postgres
           image: postgres:15
+
+          # Security context
+          securityContext:
+            runAsUser: 999
+            runAsGroup: 999
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false  # Allow writes for development
+
           ports:
             - containerPort: 5432
               name: postgres
+              protocol: TCP
 
           envFrom:
             - secretRef:
@@ -37,6 +50,11 @@ spec:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
 
+            - name: postgres-config
+              mountPath: /etc/postgresql/postgresql.conf 
+              subPath: postgresql.conf
+              readOnly: true
+ 
           readinessProbe:
             exec:
               command: ["sh","-c","pg_isready -U $POSTGRES_USER"]
@@ -57,6 +75,14 @@ spec:
               memory: "512Mi"
             limits:
               memory: "1Gi"
+
+      volumes:
+        - name: postgres-config
+          configMap:
+            name:  postgres-init-scripts
+            items:
+              - key: postgresql.conf
+                path: postgresql.conf
 
   volumeClaimTemplates:
     - metadata:

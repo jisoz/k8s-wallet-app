@@ -1,0 +1,66 @@
+# 2. Init Job that runs after PostgreSQL is ready
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: postgres-init-databases
+spec:
+  backoffLimit: 3  # Retry 3 times
+  template:
+    spec:
+      restartPolicy: OnFailure
+      initContainers:
+      - name: wait-for-postgres
+        image: postgres:15-alpine
+        command:
+          - /bin/sh
+          - -c
+          - |
+            until pg_isready -h postgres -p 5432 -U postgres; do
+              echo "Waiting for PostgreSQL to be ready..."
+              sleep 5
+            done
+            echo "PostgreSQL is ready!"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+      
+      containers:
+      - name: init-databases
+        image: postgres:15-alpine
+        command:
+          - /bin/sh
+          - -c
+          - |
+            # Run initialization script
+            psql -h postgres -U postgres -d postgres -f /scripts/init-databases.sql
+            
+            # Verify databases were created
+            echo "Checking created databases:"
+            psql -h postgres -U postgres -d postgres -c "\l"
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts
+        
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 999
+      
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: postgres-init-scripts
