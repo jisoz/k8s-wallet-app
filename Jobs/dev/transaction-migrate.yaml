@@ -1,0 +1,30 @@
+# wallet/dev/wallet-migration-minimal.yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: transaction-migrate
+  namespace: wallet-dev
+spec:
+  ttlSecondsAfterFinished: 300  # Delete after 5 minutes
+  template:
+    spec:
+      containers:
+      - name: migrate
+        image: utc-discussions-mission-ground.trycloudflare.com/transaction:dev-f3dea94
+        command: ["./main", "migrate", "--config", "/config/config.yaml"]
+        env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: transaction-secrets
+              key: DB_PASSWORD
+        volumeMounts:
+        - name: config
+          mountPath: /config
+      restartPolicy: Never
+      volumes:
+      - name: config
+        configMap:
+          name: transaction-config
+      imagePullSecrets:
+      - name: regcred

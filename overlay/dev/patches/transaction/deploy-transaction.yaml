@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: transaction
-          image: utc-discussions-mission-ground.trycloudflare.com/transaction:dev-bc388e4
+          image: utc-discussions-mission-ground.trycloudflare.com/transaction:dev-f3dea94
           resources:
             requests:
               cpu: 100m
