@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transaction
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+        - name: transaction
+          image: utc-discussions-mission-ground.trycloudflare.com/transaction:dev-bc388e4
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+
+  

@@ -2,9 +2,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wallet
+  name: transaction
   labels:
-    app: wallet
+    app: transaction
     environment: dev
 spec:
   # DEVELOPMENT: Start with 1 replica, scale as needed
@@ -17,18 +17,18 @@ spec:
   
   selector:
     matchLabels:
-      app: wallet
+      app: transaction
       environment: dev
   
   template:
     metadata:
       labels:
-        app: wallet
+        app: transaction
         environment: dev
         version: "dev"
     
     spec:
-      serviceAccountName: wallet-sa
+      serviceAccountName: transaction-sa
       
       # Wait for dependencies (Development)
       initContainers:
@@ -43,12 +43,7 @@ spec:
                 sleep 2
               done
               echo "PostgreSQL is ready!"
-              
-              echo "Waiting for Redis..."
-              until nc -z redis.wallet-dev.svc.cluster.local 6379; do
-                sleep 2
-              done
-              echo "Redis is ready!"
+            
           
           resources:
             requests:
@@ -56,7 +51,7 @@ spec:
               memory: 16Mi
       
       containers:
-        - name: wallet
+        - name: transaction
           # DEVELOPMENT: Use your Cloudflare tunnel registry
           image: tom-surprised-traveler-crossing.trycloudflare.com/wallet:main
           imagePullPolicy: Always  # Dev: always pull latest
@@ -80,17 +75,16 @@ spec:
             - "/config/config.yaml"
           
           ports:
-            - name: swagger
-              containerPort: 1314
-              
+            
+            
             - name: api
-              containerPort: 8081  
+              containerPort: 8082  
           
           env:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: wallet-secrets
+                  name: transaction-secrets
                   key: DB_PASSWORD
             # Development environment variables
             - name: ENVIRONMENT
@@ -163,6 +157,6 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: wallet-config
+            name: transaction-config
         - name: tmp
           emptyDir: {}
