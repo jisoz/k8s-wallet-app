@@ -99,28 +99,28 @@ spec:
               value: "debug"
           
           # Health checks (adjust for your app startup time)
-          startupProbe:
-            httpGet:
-              path: /api/v1/health
-              port: 1314
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 30  # 2.5 minutes max
+          # startupProbe:
+          #   httpGet:
+          #     path: /api/v1/health
+          #     port: 1314
+          #   initialDelaySeconds: 10
+          #   periodSeconds: 5
+          #   failureThreshold: 30  # 2.5 minutes max
           
-          readinessProbe:
-            httpGet:
-              path: /api/v1/health
-              port: 1314
-            initialDelaySeconds: 5
-            periodSeconds: 10
-            timeoutSeconds: 3
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/v1/health
+          #     port: 1314
+          #   initialDelaySeconds: 5
+          #   periodSeconds: 10
+          #   timeoutSeconds: 3
           
-          livenessProbe:
-            httpGet:
-              path: /api/v1/health
-              port: 1314
-            initialDelaySeconds: 30  # Shorter for dev
-            periodSeconds: 15
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/v1/health
+          #     port: 1314
+          #   initialDelaySeconds: 30  # Shorter for dev
+          #   periodSeconds: 15
           
           # Development resources
           resources:

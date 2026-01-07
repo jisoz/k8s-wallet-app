@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
         - name: frontend
-          image:  tom-surprised-traveler-crossing.trycloudflare.com/frontend:dev-b132d4d
+          image:  utc-discussions-mission-ground.trycloudflare.com/frontend:dev-b132d4d
 
