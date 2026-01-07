@@ -20,4 +20,8 @@ patches:
   - path: patches/wallet/wallet-secret.yaml
   - path: patches/wallet/deploy-wallet.yaml
   - path: patches/wallet/configmap.yaml
+  
+  - path: patches/transaction/configmap.yaml
+  - path: patches/transaction/deploy-transaction.yaml
+  - path: patches/transaction/transaction-secret.yaml
 
