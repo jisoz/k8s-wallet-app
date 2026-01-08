@@ -94,7 +94,7 @@ data:
       
       # FRONTEND SERVICE
       - name: frontend-service
-        url: http://frontend.wallet-dev.svc.cluster.local:80
+        url: http://frontend.wallet-dev.svc.cluster.local:8080
         routes:
           - name: frontend-app
             paths:
