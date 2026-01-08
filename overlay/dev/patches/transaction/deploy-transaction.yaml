@@ -8,7 +8,7 @@ spec:
     spec:
       containers:
         - name: transaction
-          image: utc-discussions-mission-ground.trycloudflare.com/transaction:dev-f3dea94
+          image: episodes-wax-award-apparel.trycloudflare.com/transaction:dev-f3dea94
           resources:
             requests:
               cpu: 100m
