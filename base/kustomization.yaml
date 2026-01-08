@@ -8,3 +8,4 @@ resources:
   - apps/wallet
   - apps/frontend
   - apps/transaction
+  - apps/kong

@@ -1,0 +1,136 @@
+# kong/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-config
+data:
+  kong.yaml: |
+    _format_version: "3.0"
+    _transform: true
+    
+    services:
+      # WALLET SERVICE ROUTES (using API port 8081)
+      - name: wallet-service-users
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1/wallets
+        routes:
+          - name: users-create
+            paths:
+              - /users
+            strip_path: true
+            methods:
+              - POST
+              - OPTIONS
+      
+      - name: wallet-service-deposit
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1/wallets/deposit
+        routes:
+          - name: wallet-deposit
+            paths:
+              - /wallets/deposit
+            strip_path: true
+            methods:
+              - POST
+              - OPTIONS
+      
+      - name: wallet-service-withdraw
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1/wallets/withdraw
+        routes:
+          - name: wallet-withdraw
+            paths:
+              - /wallets/withdraw
+            strip_path: true
+            methods:
+              - POST
+              - OPTIONS
+      
+      - name: wallet-service-transfer
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1/wallets/transfer
+        routes:
+          - name: wallet-transfer
+            paths:
+              - /wallets/transfer
+            strip_path: true
+            methods:
+              - POST
+              - OPTIONS
+      
+      - name: wallet-service-balance
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1
+        routes:
+          - name: wallet-balance
+            paths:
+              - "/wallets/"
+            strip_path: false
+            methods:
+              - GET
+              - OPTIONS
+      
+      - name: wallet-service-health
+        url: http://wallet.wallet-dev.svc.cluster.local:8081/api/v1/health
+        routes:
+          - name: health-check
+            paths:
+              - /health
+            strip_path: true
+            methods:
+              - GET
+              - OPTIONS
+      
+      # TRANSACTIONS SERVICE (using port 8082)
+      - name: transactions-service
+        url: http://transactions.wallet-dev.svc.cluster.local:8082
+        routes:
+          - name: transactions-api
+            paths:
+              - /api/v1/transactions
+              - /api/v1/transactions/.*
+            strip_path: true
+            methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+      
+      # FRONTEND SERVICE
+      - name: frontend-service
+        url: http://frontend.wallet-dev.svc.cluster.local:80
+        routes:
+          - name: frontend-app
+            paths:
+              - /
+              - /index.html
+              - /static/.*
+              - /assets/.*
+            strip_path: false
+    
+    plugins:
+      - name: rate-limiting
+        config:
+          minute: 300
+          hour: 10000
+          policy: local
+          fault_tolerant: true
+          hide_client_headers: false
+      
+      - name: cors
+        config:
+          origins:
+            - "*"
+          methods:
+            - GET
+            - HEAD
+            - PUT
+            - PATCH
+            - POST
+            - DELETE
+            - OPTIONS
+            - TRACE
+            - CONNECT
+          headers:
+            - "*"
+          exposed_headers:
+            - "*"
+          credentials: true
+          max_age: 3600
+          preflight_continue: false

@@ -1,0 +1,60 @@
+# kong/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong
+  labels:
+    app: kong
+spec:
+  selector:
+    app: kong
+ 
+  
+  ports:
+  - name: proxy-http
+    port: 80           # External HTTP
+    targetPort: 8000   # Kong proxy port
+    protocol: TCP
+  
+  - name: proxy-https
+    port: 443          # External HTTPS
+    targetPort: 8443   # Kong HTTPS port
+    protocol: TCP
+  
+  - name: admin-api
+    port: 8001         # Admin API (internal)
+    targetPort: 8001
+    protocol: TCP
+  
+  - name: admin-gui
+    port: 8002         # Admin GUI (optional)
+    targetPort: 8002
+    protocol: TCP
+  
+  # Choose ONE based on your environment:
+  
+  # Option 1: LoadBalancer (Cloud - AWS, GCP, Azure)
+  type: LoadBalancer
+  # Optional annotations for cloud providers:
+  # annotations:
+  #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+  #   service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+  #   service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+  
+  # Option 2: NodePort (On-prem/Dev)
+  # type: NodePort
+  # ports:
+  # - name: proxy-http
+  #   port: 80
+  #   targetPort: 8000
+  #   nodePort: 30000  # 30000-32767
+  
+  # Option 3: ClusterIP + Ingress (if you have another ingress controller)
+  # type: ClusterIP
+  # Then create an Ingress that points to kong service
+  
+  # Preserve client IP
+  externalTrafficPolicy: Local
+  
+  # Session affinity if needed
+  sessionAffinity: None

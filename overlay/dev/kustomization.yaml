@@ -25,3 +25,4 @@ patches:
   - path: patches/transaction/deploy-transaction.yaml
   - path: patches/transaction/transaction-secret.yaml
 
+  - path: patches/kong/kong-configmap.yaml
