@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
         - name: frontend
-          image:  episodes-wax-award-apparel.trycloudflare.com/frontend:dev-3905acd
+          image:  episodes-wax-award-apparel.trycloudflare.com/frontend:dev-71448c2
 
