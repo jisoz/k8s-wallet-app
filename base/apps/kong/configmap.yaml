@@ -111,9 +111,7 @@ data:
           - name: wallet-swagger
             paths:
               - /swagger
-              - /swagger-ui
-              - /docs
-              - /api-docs
+              - /swagger/*
             strip_path: false  
             methods:
               - GET
