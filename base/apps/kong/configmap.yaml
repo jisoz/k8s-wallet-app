@@ -103,6 +103,7 @@ data:
               - /index.html
               - /static/.*
               - /assets/.*
+              - ~^(?!/swagger).*$
             strip_path: false
       
       - name: swagger 
