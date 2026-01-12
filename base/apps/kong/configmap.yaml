@@ -104,7 +104,20 @@ data:
               - /static/.*
               - /assets/.*
             strip_path: false
-    
+      
+      - name: swagger 
+        url: http://wallet.wallet-dev.svc.cluster.local:1314
+        routes:
+          - name: wallet-swagger
+            paths:
+              - /swagger
+              - /swagger-ui
+              - /docs
+              - /api-docs
+            strip_path: false  
+            methods:
+              - GET
+              - OPTIONS
     plugins:
       - name: rate-limiting
         config:
